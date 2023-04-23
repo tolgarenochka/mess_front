@@ -14,12 +14,46 @@
             <label>Password</label>
             <div class="border"></div>
         </div>
- 
+        <div class="error" v-if="isError">
+                Not valid password or login
+        </div>
         <input type="submit" class="btn" value="Log In" @click.prevent="login()">
+
         </form>
     </div>
 
 </template>
+
+<script>
+import {api} from "../api"
+
+export default {
+  data(){
+   return{
+	username:'',
+	password:'',
+    isError: false
+   }
+  },
+  methods:{
+   login(){
+    api.post('/auth', {mail: this.username, pas: this.password})
+    .then(response => {
+        localStorage.setItem('token', response.data.token);
+        localStorage.setItem('my_name', response.data.full_name);
+        localStorage.setItem('my_photo', response.data.photo);
+        this.$router.push("/")
+    })
+    .catch(() => {
+        this.isError = true;
+        localStorage.removeItem("token");
+        localStorage.removeItem("my_name");
+        localStorage.removeItem("my_photo");
+    })
+   }
+  }
+};
+</script>
 
 <style>
 *{
@@ -34,6 +68,14 @@ position: absolute;
 top: 50%;
 left: 50%;
 transform: translate(-50%, -50%);
+}
+
+.error{
+text-align: center;
+color: rgb(221, 83, 83);
+font-size: 16px;
+font-weight: 500;
+margin-bottom: 15px;
 }
 
 .card{
@@ -115,24 +157,3 @@ transition: .5s;
 border: 2px solid white;
 }
 </style>
-
-
-<script>
-import axios from 'axios'
-
-export default {
-  data(){
-   return{
-	username:'',
-	password:''
-   }
-  },
-  methods:{
-   login(){
-    axios
-  .post('/auth', {mail: this.username, pas: this.password})
-  .then(response => (this.info = response.data.bpi));
-   }
-  }
-};
-</script>

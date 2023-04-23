@@ -1,196 +1,153 @@
 <template>
     <div id="container">
+        <header>
+            <div id="info"> 
+                <div id="profile">
+                    <img ref="userAvatar">
+                </div>
+                <div id="my_name">{{ full_name }}</div>
+                <img id="exit" src="https://img.icons8.com/pulsar-color/96/null/exit.png" alt="Выход" @click="logout()">
+            </div>
+        </header>
       <aside>
           <header>
               <input type="text" placeholder="search">
           </header>
           <ul>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_01.jpg" alt="">
+              <li v-for="item in list" :key="item.id" @click="clickHandler(item)">
+                  <img :src="'data:image/gif;base64,' + item.friend_photo">
                   <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          offline
+                      <h2>{{ item.full_name }}</h2>
+                      <h3 v-if="item.are_you_last_mes_sender">
+                          Вы: {{ item.last_mes.slice(0, 35) }}...
                       </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_02.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          <span class="status green"></span>
-                          online
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_03.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          offline
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_04.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          <span class="status green"></span>
-                          online
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_05.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          offline
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_06.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          <span class="status green"></span>
-                          online
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_07.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          <span class="status green"></span>
-                          online
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_08.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          <span class="status green"></span>
-                          online
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_09.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          <span class="status green"></span>
-                          online
-                      </h3>
-                  </div>
-              </li>
-              <li>
-                  <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_10.jpg" alt="">
-                  <div>
-                      <h2>Prénom Nom</h2>
-                      <h3>
-                          offline
+                      <h3 v-else>
+                        <span v-if="!item.is_read" class="status green"></span>
+                          {{ item.last_mes }}
                       </h3>
                   </div>
               </li>
           </ul>
       </aside>
-      <main>
+      <main v-if="$route.query.dialogId">
           <header>
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/chat_avatar_01.jpg" alt="">
               <div>
-                  <h2>Chat with Vincent Porter</h2>
-                  <h3>already 1902 messages</h3>
+                  <h2>{{this.currentCompanion.full_name}}</h2>
               </div>
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_star.png" alt="">
           </header>
           <ul id="chat">
-              <li class="you">
+              <li :class="message.am_i_sender ? 'me' : 'you'" v-for="message in messagesList" :key="message.id">
                   <div class="entete">
-                      <span class="status green"></span>
-                      <h2>Vincent</h2>
-                      <h3>10:12AM, Today</h3>
+                      <h3>{{ message.time.split('T')[0].split('-').reverse().join('.') }}</h3>
                   </div>
                   <div class="triangle"></div>
                   <div class="message">
-                      Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
-                  </div>
-              </li>
-              <li class="me">
-                  <div class="entete">
-                      <h3>10:12AM, Today</h3>
-                      <h2>Vincent</h2>
-                      <span class="status blue"></span>
-                  </div>
-                  <div class="triangle"></div>
-                  <div class="message">
-                      Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
-                  </div>
-              </li>
-              <li class="me">
-                  <div class="entete">
-                      <h3>10:12AM, Today</h3>
-                      <h2>Vincent</h2>
-                      <span class="status blue"></span>
-                  </div>
-                  <div class="triangle"></div>
-                  <div class="message">
-                      OK
-                  </div>
-              </li>
-              <li class="you">
-                  <div class="entete">
-                      <span class="status green"></span>
-                      <h2>Vincent</h2>
-                      <h3>10:12AM, Today</h3>
-                  </div>
-                  <div class="triangle"></div>
-                  <div class="message">
-                      Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
-                  </div>
-              </li>
-              <li class="me">
-                  <div class="entete">
-                      <h3>10:12AM, Today</h3>
-                      <h2>Vincent</h2>
-                      <span class="status blue"></span>
-                  </div>
-                  <div class="triangle"></div>
-                  <div class="message">
-                      Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Aenean commodo ligula eget dolor.
-                  </div>
-              </li>
-              <li class="me">
-                  <div class="entete">
-                      <h3>10:12AM, Today</h3>
-                      <h2>Vincent</h2>
-                      <span class="status blue"></span>
-                  </div>
-                  <div class="triangle"></div>
-                  <div class="message">
-                      OK
+                      {{ message.text }}
                   </div>
               </li>
           </ul>
           <footer>
-              <textarea placeholder="Type your message"></textarea>
+              <textarea placeholder="Type your message" v-model="mes_text" @keyup.enter.exact.prevent="sendMessage()"
+              @keydown.enter.shift.exact.prevent="mes_text += '\n'"
+              ></textarea>
               <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_picture.png" alt="">
               <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_file.png" alt="">
-              <a href="#">Send</a>
+              <a href="#" @click="sendMessage()" >Send</a>
           </footer>
+      </main>
+      <main v-else>
+        <div id="select_dialog">Select dialog...</div>
       </main>
   </div>
   </template>
   
   <script>
+import {api} from "../api"
+
+    export default {
+  data(){
+   return{
+	username:'',
+	password:'',
+    list: [],
+    messagesList: [],
+    currentCompanion: {},
+    full_name:'',
+    friend_name:'',
+    isError:false,
+    mes_text:''
+   }
+  },
+  created(){
+    if (!localStorage.getItem('token')) {
+      return this.$router.push('/login');
+    }
+  },
+  mounted: function() {
+      this.getDialogs() // Calls the method before page loads
+      if (this.$route.query.dialogId) {
+        this.getMessages();
+        this.searchCompanion(this.$route.query.dialogId);
+      }
+      this.getPhoto();
+      this.getFullName();
+  },
+  watch: {
+    "$route"() {
+        this.getMessages();
+        this.searchCompanion(this.$route.query.dialogId);
+    }
+  },
+    methods:{
+    getPhoto(){
+        this.$refs.userAvatar.src = `data:image/gif;base64,${localStorage.getItem("my_photo")}`;
+    },
+    getFullName(){
+        this.full_name = localStorage.getItem("my_name");
+    },
+    getDialogs(){
+        api.get('/dialogList')
+        .then((res) => {
+            this.list = res.data;
+            this.friend_name = this.list.full_name;
+        })
+    },
+   getMessages() {
+        api.post('/mesList', {dialog_id: +this.$route.query.dialogId})
+            .then((res) => {
+                this.messagesList = res.data;
+            })
+   },
+   clickHandler(item) {
+    this.$router.replace({ path: this.$route.path, query: { dialogId: item.id } });
+    this.currentCompanion = item;
+    this.friend_name = item.full_name;
+   },
+   searchCompanion(id) {
+    this.currentCompanion = this.list.find(item => item.id == id);
+   }, 
+   getTime() {
+    return new Date();
+  },
+   sendMessage() {
+        if ((this.mes_text != "\n") && (this.mes_text != " ") && (this.mes_text != "")) {
+        api.post('/sendMes', {dialog_id: +this.$route.query.dialogId, text: this.mes_text, send_time: this.getTime()})
+            .then(() => {
+                this.mes_text = ""
+            })
+        }
+   }, 
+   logout(){
+    api.post('/logout')
+    .then(() => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("my_name");
+        localStorage.removeItem("my_photo");
+        this.$router.push("/login")
+    })
+   }
+  }
+};
   </script>
   
   <style>
@@ -201,9 +158,47 @@
       background-color:#abd9e9;
       font-family:Arial;
   }
+  #info{
+    width:1400px;
+    height:75px;
+    background-color:#fff;
+    display: flex;
+    flex-direction: row-reverse;
+  }
+  #profile{
+    width:60px;
+    height:60px;
+    position:relative; 
+    margin-right: 10px;
+  }
+  #profile img{
+    border-radius:50%;
+    position:relative; 
+    width:55px;
+    height:55px;
+    margin-top: 10px;
+    cursor:pointer;
+  }
+  #my_name{
+    text-align: center;
+    font-size:16px;
+    color:#7e818a;
+    font-weight:normal;
+    margin-top: 30px;
+    margin-right: 20px;
+    cursor:pointer;
+  }
+  #exit{
+    position:relative; 
+    width:30px;
+    height:30px;
+    margin-top:23px;
+    margin-right:20px;
+    cursor:pointer;
+  }
   #container{
       width:1400px;
-      height:90%;
+      height:80%;
       background:#eff3f7;
       margin:0 auto;
       font-size:0;
@@ -212,7 +207,7 @@
   }
   aside{
       width:360px;
-      height:800px;
+      height:700px;
       background-color:#3b3e49;
       display:inline-block;
       font-size:15px;
@@ -220,7 +215,7 @@
   }
   main{
       width:1000px;
-      height:800px;
+      height:700px;
       display:inline-block;
       font-size:15px;
       vertical-align:top;
@@ -266,6 +261,9 @@
       border-radius:50%;
       margin-left:20px;
       margin-right:8px;
+      margin-top:8px;
+      width:55px;
+      height:55px;
   }
   aside li div{
       display:inline-block;
@@ -277,6 +275,7 @@
       color:#fff;
       font-weight:normal;
       margin-bottom:5px;
+      text-align: left;
   }
   aside li h3{
       font-size:12px;
@@ -296,8 +295,8 @@
   }
   
   main header{
-      height:110px;
-      padding:30px 20px 30px 40px;
+      height:60px;
+      /* padding:30px 20px 30px 40px; */
   }
   main header > *{
       display:inline-block;
@@ -317,19 +316,27 @@
   main header h2{
       font-size:16px;
       margin-bottom:5px;
+      color:#3b3e49
   }
   main header h3{
       font-size:14px;
       font-weight:normal;
       color:#7e818a;
   }
-  
+  #select_dialog{
+      font-size:16px;
+      font-weight:normal;
+      color:#7e818a;
+      text-align:center;
+      margin-top:30%;
+      margin-left:10%;
+  }
   #chat{
       padding-left:0;
       margin:0;
       list-style-type:none;
-      overflow-y:scroll;
-      height:535px;
+      overflow-y:auto;
+      height:490px;
       border-top:2px solid #fff;
       border-bottom:2px solid #fff;
   }

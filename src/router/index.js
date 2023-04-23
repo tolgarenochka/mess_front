@@ -19,16 +19,14 @@ const router = createRouter({
   routes,
 });
 
-// router.beforeEach((to, from, next) => {
-//   if(to.matched.some(record => record.meta.requiresAuth)) {
-//     if (store.getters.isLoggedIn) {
-//       next()
-//       return
-//     }
-//     next('/login') 
-//   } else {
-//     next() 
+// router.beforeEach((data) => {
+//   const {next, router} = data;
+//   if (!localStorage.getItem('token')) {
+//     console.log("eurwfdhsjkvfr")
+//     next()
+//   return router.push({ name: 'login' });
 //   }
+//   next()
 // })
 
 export default router;
