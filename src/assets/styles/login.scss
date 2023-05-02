@@ -1,0 +1,86 @@
+.login {
+  font-family: sans-serif;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  &__title {
+    color: white;
+    text-align: center;
+    margin-bottom: 10px;
+  }
+  &__form {
+    width: 380px;
+    padding: 20px;
+    border-radius: 6px;
+    box-shadow: 0 0 8px silver;
+    background: #5e616a;
+  }
+  &__error {
+    text-align: center;
+    color: rgb(221, 83, 83);
+    font-size: 16px;
+    font-weight: 500;
+    margin-bottom: 15px;
+  }
+  &__button {
+    width: 100%;
+    height: 50px;
+    border-radius: 8px;
+    background: none;
+    border: 2px solid silver;
+    color: white;
+    font-size: 18px;
+    transition: 0.5s;
+    &:hover {
+      border: 2px solid white;
+    }
+  }
+}
+
+.input-login {
+  width: 100%;
+  height: 40px;
+  position: relative;
+  margin-bottom: 30px;
+  &__field {
+    width: 100%;
+    height: 100%;
+    padding: 0 10px;
+    border: none;
+    border-bottom: 2px solid silver;
+    background: none;
+    font-size: 18px;
+    color: #abd9e9;
+    &:focus,
+    &:valid {
+      & ~ .input-login__border {
+        width: 100%;
+      }
+      & ~ .input-login__label {
+        top: -12px;
+        left: 0;
+        color: white;
+        font-size: 14px;
+      }
+    }
+  }
+  &__label {
+    position: absolute;
+    top: 8px;
+    left: 14px;
+    color: silver;
+    pointer-events: none;
+    font-size: 18px;
+    transition: 0.5s;
+  }
+  &__border {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    width: 0;
+    height: 2px;
+    background: white;
+    transition: 0.5s;
+  }
+}

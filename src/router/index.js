@@ -1,7 +1,6 @@
 import { createWebHistory, createRouter } from "vue-router";
-import Login from "../components/LogPage";
-import Home from "../components/MainPage";
-
+import Login from "../components/Pages/LoginPage";
+import Home from "../components/Pages/MainPage";
 
 const routes = [
   {
@@ -18,15 +17,5 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
 });
-
-// router.beforeEach((data) => {
-//   const {next, router} = data;
-//   if (!localStorage.getItem('token')) {
-//     console.log("eurwfdhsjkvfr")
-//     next()
-//   return router.push({ name: 'login' });
-//   }
-//   next()
-// })
 
 export default router;
