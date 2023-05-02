@@ -53,9 +53,9 @@ export default {
     }
   },
   created() {
-    // if (!localStorage.getItem('token')) {
-    //   return this.$router.push('/login');
-    // }
+    if (!localStorage.getItem('token')) {
+      return this.$router.push('/login');
+    }
   },
   mounted() {
     this.getDialogs();

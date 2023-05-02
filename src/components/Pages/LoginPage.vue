@@ -21,7 +21,7 @@
 </template>
 
 <script>
-// import { api } from "../../api"
+import { api } from "../../api"
 
 export default {
   data() {
@@ -33,20 +33,19 @@ export default {
   },
   methods: {
     login() {
-      this.$router.push("/")
-      // api.post('/auth', { mail: this.username, pas: this.password })
-      //   .then(response => {
-      //     localStorage.setItem('token', response.data.token);
-      //     localStorage.setItem('my_name', response.data.full_name);
-      //     localStorage.setItem('my_photo', response.data.photo);
-      //     this.$router.push("/")
-      //   })
-      //   .catch(() => {
-      //     this.isError = true;
-      //     localStorage.removeItem("token");
-      //     localStorage.removeItem("my_name");
-      //     localStorage.removeItem("my_photo");
-      //   })
+      api.post('/auth', { mail: this.username, pas: this.password })
+        .then(response => {
+          localStorage.setItem('token', response.data.token);
+          localStorage.setItem('my_name', response.data.full_name);
+          localStorage.setItem('my_photo', response.data.photo);
+          this.$router.push("/")
+        })
+        .catch(() => {
+          this.isError = true;
+          localStorage.removeItem("token");
+          localStorage.removeItem("my_name");
+          localStorage.removeItem("my_photo");
+        })
     }
   }
 };
