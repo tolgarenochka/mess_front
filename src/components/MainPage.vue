@@ -3,23 +3,27 @@
         <header>
             <div id="info"> 
                 <div id="profile">
-                    <img ref="userAvatar">
+                    <img :src="this.my_photo">
                 </div>
                 <div id="my_name">{{ full_name }}</div>
                 <img id="exit" src="https://img.icons8.com/pulsar-color/96/null/exit.png" alt="Выход" @click="logout()">
             </div>
         </header>
       <aside>
-          <header>
-              <input type="text" placeholder="search">
-          </header>
+          <div class="search" @submit.prevent="searchDialogs">
+            <img class="search-icon" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_search.png" />
+            <input v-model="search" class="search-input" type="text" placeholder="search">
+          </div>
+          <button class="create-dialog-button" type="button" @click="showModal = true">
+            +
+          </button>
           <ul>
-              <li v-for="item in list" :key="item.id" @click="clickHandler(item)">
-                  <img :src="'data:image/gif;base64,' + item.friend_photo">
+              <li v-for="item in dialogs" :key="item.id" @click="clickHandler(item)">
+                  <img :src="item.friend_photo">
                   <div>
                       <h2>{{ item.full_name }}</h2>
                       <h3 v-if="item.are_you_last_mes_sender">
-                          Вы: {{ item.last_mes.slice(0, 35) }}...
+                          Вы: {{ item.last_mes }}
                       </h3>
                       <h3 v-else>
                         <span v-if="!item.is_read" class="status green"></span>
@@ -35,10 +39,10 @@
                   <h2>{{this.currentCompanion.full_name}}</h2>
               </div>
           </header>
-          <ul id="chat">
-              <li :class="message.am_i_sender ? 'me' : 'you'" v-for="message in messagesList" :key="message.id">
+          <ul id="chat" ref="messagesList">
+              <li :class="message.am_i_sender ? 'me' : 'you'" v-for="message in messagesList" :key="message.time">
                   <div class="entete">
-                      <h3>{{ message.time.split('T')[0].split('-').reverse().join('.') }}</h3>
+                      <h3>{{ generateDate(message.time) }}</h3>
                   </div>
                   <div class="triangle"></div>
                   <div class="message">
@@ -47,24 +51,27 @@
               </li>
           </ul>
           <footer>
-              <textarea placeholder="Type your message" v-model="mes_text" @keyup.enter.exact.prevent="sendMessage()"
-              @keydown.enter.shift.exact.prevent="mes_text += '\n'"
+              <textarea placeholder="Type your message" v-model="mes_text" 
+              @keyup.enter.exact.prevent="sendMessage()" autofocus
               ></textarea>
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_picture.png" alt="">
-              <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_file.png" alt="">
-              <a href="#" @click="sendMessage()" >Send</a>
+              <!-- <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_picture.png" alt=""> -->
+              <!-- <img src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_file.png" alt=""> -->
+              <button type="button" @click="sendMessage()" >Send</button>
           </footer>
       </main>
       <main v-else>
         <div id="select_dialog">Select dialog...</div>
       </main>
+      <AddDialog v-if="showModal" @close="showModal = false" />
   </div>
   </template>
   
-  <script>
+<script>
 import {api} from "../api"
+import AddDialog from "./Models/AddDialog.vue";
 
-    export default {
+export default {
+  components: {AddDialog},
   data(){
    return{
 	username:'',
@@ -75,8 +82,23 @@ import {api} from "../api"
     full_name:'',
     friend_name:'',
     isError:false,
-    mes_text:''
+    mes_text:'', 
+    connection: null,
+    my_photo:'',
+    search: '',
+    showModal: false,
    }
+  },
+  computed: {
+    dialogs() {
+        console.log('hello');
+        if (this.search) {
+            console.log(this.list);
+            console.log(this.search.trim().toLowerCase());
+            return this.list.filter(item => item.full_name.trim().toLowerCase().includes(this.search.trim().toLowerCase()));
+        }
+        return this.list;
+    }
   },
   created(){
     if (!localStorage.getItem('token')) {
@@ -85,22 +107,42 @@ import {api} from "../api"
   },
   mounted: function() {
       this.getDialogs() // Calls the method before page loads
-      if (this.$route.query.dialogId) {
-        this.getMessages();
-        this.searchCompanion(this.$route.query.dialogId);
-      }
+    //   if (this.$route.query.dialogId) {
+    //     this.getMessages();
+    //     this.searchCompanion(this.$route.query.dialogId);
+    //   }
       this.getPhoto();
       this.getFullName();
+
+      console.log("Starting connection to WebSocket Server")
+    this.connection = new WebSocket("ws://127.0.0.1:8081")
+
+    this.connection.onmessage = function(event) {
+        // solve message frow ws
+      console.log(event);
+    }
+
+    this.connection.onopen = function(event) {
+      console.log(event)
+      console.log("Successfully connected to the echo websocket server...")
+    }
   },
   watch: {
     "$route"() {
         this.getMessages();
         this.searchCompanion(this.$route.query.dialogId);
-    }
+    },
   },
     methods:{
+    searchDialogs() {
+
+    },
     getPhoto(){
-        this.$refs.userAvatar.src = `data:image/gif;base64,${localStorage.getItem("my_photo")}`;
+        var photo = localStorage.getItem("my_photo");
+        if (photo == "") {
+            photo = 'user_photo/default.png';
+        }
+        this.my_photo=photo;
     },
     getFullName(){
         this.full_name = localStorage.getItem("my_name");
@@ -116,6 +158,9 @@ import {api} from "../api"
         api.post('/mesList', {dialog_id: +this.$route.query.dialogId})
             .then((res) => {
                 this.messagesList = res.data;
+                this.$nextTick(() => {
+                    this.$refs.messagesList.scrollTo(0, this.$refs.messagesList.scrollHeight);
+                })
             })
    },
    clickHandler(item) {
@@ -127,16 +172,38 @@ import {api} from "../api"
     this.currentCompanion = this.list.find(item => item.id == id);
    }, 
    getTime() {
-    return new Date();
+    return new Date().toISOString();
   },
-   sendMessage() {
-        if ((this.mes_text != "\n") && (this.mes_text != " ") && (this.mes_text != "")) {
-        api.post('/sendMes', {dialog_id: +this.$route.query.dialogId, text: this.mes_text, send_time: this.getTime()})
-            .then(() => {
-                this.mes_text = ""
-            })
-        }
-   }, 
+  generateDate(time) {
+    const splitted = time.split('T');
+    return `${splitted[1].split('Z')[0].split('.')[0]} ${splitted[0].split('-').reverse().join('.') }`
+  },
+sendMessage: function() {
+      var dialog = +this.$route.query.dialogId;
+      var txt = this.mes_text;
+      this.mes_text = "";
+      var time = this.getTime();
+      this.messagesList.push({id: 0, time: time, text: txt, am_i_sender: true, files: [
+            {
+                "path": "path",
+                "name": "name"
+            }
+        ]});
+        this.list[this.list.findIndex(item => item.id === dialog)].last_mes = txt;
+    this.$nextTick(() => {
+        this.$refs.messagesList.scrollTo(0, this.$refs.messagesList.scrollHeight);
+        
+    })
+      var to_send = { event: "SendMessage", token: localStorage.getItem('token'), message_data: {dialog_id: dialog, text: txt, send_time: time}};
+      this.connection.send(JSON.stringify(to_send));
+    }, 
+    readDialog: function() {
+      var dialog = +this.$route.query.dialogId;
+      this.list[this.list.findIndex(item => item.id === dialog)].is_read = false;
+
+      var to_send = { event: "ReadDialog", token: localStorage.getItem('token'), dialog_id: dialog };
+      this.connection.send(JSON.stringify(to_send));
+    }, 
    logout(){
     api.post('/logout')
     .then(() => {
@@ -220,23 +287,11 @@ import {api} from "../api"
       font-size:15px;
       vertical-align:top;
   }
-  
+  aside {
+    position: relative;
+  }
   aside header{
       padding:30px 20px;
-  }
-  aside input{
-      width:100%;
-      height:50px;
-      line-height:50px;
-      padding:0 50px 0 20px;
-      background-color:#5e616a;
-      border:none;
-      border-radius:3px;
-      color:#fff;
-      background-image:url(https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_search.png);
-      background-repeat:no-repeat;
-      background-position:170px;
-      background-size:40px;
   }
   aside input::placeholder{
       color:#fff;
@@ -281,6 +336,10 @@ import {api} from "../api"
       font-size:12px;
       color:#7e818a;
       font-weight:normal;
+      max-width: 150px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
   }
   
   .status{
@@ -409,8 +468,9 @@ import {api} from "../api"
       height:30px;
       cursor:pointer;
   }
-  main footer a{
-      text-decoration:none;
+  main footer button {
+    cursor: pointer;
+       border:none;
       text-transform:uppercase;
       font-weight:bold;
       color:#6fbced;
@@ -418,6 +478,43 @@ import {api} from "../api"
       margin-left:900px;
       margin-top:5px;
       display:inline-block;
+  }
+  .search {
+    display: flex;
+    align-items: center;
+    padding: 10px 75px 10px 10px;
+    width:100%;
+    background-color:#5e616a;
+    border-radius:3px;
+    color:#fff;
+  }
+
+  .search-input {
+    flex: 1 1 auto;
+    background: transparent;
+    border: 0;
+    color: #fff;
+  }
+  .create-dialog-button {
+    position: absolute;
+    right: 0;
+    top: 0;
+    width: 69px;
+    height: 69px;
+    background: #5e616a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    color: #fff;
+    line-height: 1;
+    font-weight: 500;
+    font-size: 32px;
+    border: 0;
+    cursor: pointer;
+    transition: 0.2s linear;
+  }
+  .create-dialog-button:hover {
+    background: #3b3e49;
   }
   </style>
   

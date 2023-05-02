@@ -4,13 +4,13 @@
 
     <form>
         <div class="input-border">
-            <input type="text" class="text" required v-model="username">
+            <input autocomplete="off" type="text" class="text" required v-model="username">
             <label>Name</label>
             <div class="border"></div>
         </div>
  
         <div class="input-border">
-            <input type="password" class="text" required v-model="password">
+            <input autocomplete="off" type="password" class="text" required v-model="password">
             <label>Password</label>
             <div class="border"></div>
         </div>
