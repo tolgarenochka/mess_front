@@ -16,11 +16,13 @@
   align-items: center;
   justify-content: flex-end;
   &__avatar {
-    width: 60px;
-    height: 60px;
     position: relative;
     margin-right: 10px;
-    border-radius: 50%;
+    img {
+      border-radius: 50%;
+      width: 60px;
+      height: 60px;
+    }
   }
   &__name {
     text-align: center;
@@ -99,7 +101,7 @@
 .dialog-aside {
   display: flex;
   align-items: center;
-  padding: 10px 0;
+  padding: 10px 20px;
   transition: 0.2s;
   &:hover {
     background-color: #5e616a;
@@ -145,11 +147,12 @@
   display:inline-block;
   width: 1000px;
   height: 700px;
+  vertical-align: top;
   &__header {
-    height: 60px;
+    height: 70px;
     font-size: 16px;
-    margin-bottom: 5px;
-    color: #3b3e49
+    color: #3b3e49;
+    padding: 10px 20px;
   }
   &__messages {
     overflow-y: auto;

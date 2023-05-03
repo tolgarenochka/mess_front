@@ -4,7 +4,7 @@
       @click="$emit('logout')">
     <div class="header__name">{{ fullName }}</div>
     <div class="header__avatar">
-      <img :src="my_photo">
+      <img :src="myPhoto">
     </div>
   </header>
 </template>
