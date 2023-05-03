@@ -1,11 +1,15 @@
 .main {
   width: 1400px;
-  height: 80%;
+  height: 775px;
   background: #eff3f7;
   margin: 0 auto;
   font-size: 0;
   border-radius: 5px;
   overflow: hidden;
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
 }
 
 .header {
@@ -161,19 +165,28 @@
     border-bottom: 2px solid #fff;
   }
   &__message {
-    padding: 10px 30px;
+    padding: 10px 10px;
     font-size: 13px;
     &.you {
-      background-color: #58b666;
       border-color: transparent transparent #58b666 transparent;
       margin-left: 15px;
+      .chat__text {
+        background-color: #58b666;
+      }
+      .chat__triangle {
+        border-color: transparent transparent  #58b666 transparent;
+        margin-left: 15px;
+      }
     }
     &.me {
       text-align: right;
-      background-color: #6fbced;
+      padding-right: 20px;
+      .chat__text {
+        background-color: #6fbced;
+      }
       .chat__triangle {
         border-color: transparent transparent #6fbced transparent;
-        margin-left: 900px;
+        margin-left: 940px;
       }
     }
   }
@@ -192,6 +205,7 @@
     color: #fff;
     max-width: 90%;
     border-radius: 5px;
+    display: inline-block;
   }
   &__empty {
     font-size: 16px;
@@ -207,7 +221,7 @@
 
 .sender-chat {
   height: 155px;
-  padding: 20px 30px 10px 20px;
+  padding: 20px 0 10px 20px;
   &__text {
     resize: none;
     border: none;
@@ -226,8 +240,9 @@
     text-transform: uppercase;
     font-weight: 700;
     color: #6fbced;
-    margin-left: 900px;
+    margin-left: auto;
     margin-top: 5px;
+    display: block;
   }
 }
 
