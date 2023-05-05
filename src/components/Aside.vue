@@ -4,7 +4,7 @@
       <img class="search-aside__icon" src="https://s3-us-west-2.amazonaws.com/s.cdpn.io/1940306/ico_search.png" />
       <input v-model="search" class="search-aside__input" type="text" placeholder="search">
     </div>
-    <button class="aside__button" type="button" @click="showModal = true">
+    <button class="aside__button" type="button" @click="getUsers">
       +
     </button>
     <ul class="aside__dialogs">
@@ -23,11 +23,12 @@
       </li>
     </ul>
   </aside>
-  <AddDialog v-if="showModal" @close="showModal = false" />
+  <AddDialog :persons_list="persons" v-if="showModal" @close="showModal = false" />
 </template>
 
 <script>
 import AddDialog from "./Modals/AddDialog.vue";
+import { api } from "../api"
 export default {
   components: { AddDialog },
   props: {
@@ -39,6 +40,7 @@ export default {
   data: () => ({
     search: '',
     showModal: false,
+    persons: []
   }),
   computed: {
     dialogs() {
@@ -48,5 +50,15 @@ export default {
       return this.dialogsList;
     }
   },
+  methods: {
+    getUsers() {
+      this.showModal = true;
+
+      api.get('/usersList')
+        .then((res) => {
+          this.persons = res.data;
+        })
+    }
+  }
 };
 </script>
