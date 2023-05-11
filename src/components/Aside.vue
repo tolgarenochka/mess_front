@@ -8,7 +8,7 @@
       +
     </button>
     <ul class="aside__dialogs">
-      <li v-for="item in dialogs" class="aside__dialog dialog-aside" :key="item.id" @click="$emit('clickDialog', item)">
+      <li v-for="item in dialogs.sort(function(a, b) {return a.time - b.time;})" class="aside__dialog dialog-aside" :key="item.last_mes_text" @click="$emit('clickDialog', item)">
         <img class="dialog-aside__avatar" :src="item.friend_photo">
         <div class="dialog-aside__info">
           <div class="dialog-aside__name">{{ item.full_name }}</div>
@@ -23,7 +23,7 @@
       </li>
     </ul>
   </aside>
-  <AddDialog :persons_list="persons" v-if="showModal" @close="showModal = false" />
+  <AddDialog @getPerson="GetPerson" :persons_list="persons" :show_modal="showModal" v-if="showModal" @close="showModal = false" />
 </template>
 
 <script>
@@ -45,9 +45,23 @@ export default {
   computed: {
     dialogs() {
       if (this.search) {
-        return this.dialogsList.filter(item => item.full_name.trim().toLowerCase().includes(this.search.trim().toLowerCase()));
+        return [...this.dialogsList.filter(item => item.full_name.trim().toLowerCase().includes(this.search.trim().toLowerCase()))].sort(function(a, b) {
+        if (b.time < a.time) {
+        return -1;
+        }
+      if (b.time > a.time) {
+        return 1;
+        }
+      })
       }
-      return this.dialogsList;
+      return [...this.dialogsList].sort(function(a, b) {
+        if (b.time < a.time) {
+        return -1;
+        }
+      if (b.time > a.time) {
+        return 1;
+        }
+      })
     }
   },
   methods: {
@@ -58,7 +72,13 @@ export default {
         .then((res) => {
           this.persons = res.data;
         })
+    },
+    GetPerson(friend_id, friend_full_name, friend_photo) {
+      this.showModal = false;
+      
+      this.$emit("addPerson", friend_id, friend_full_name, friend_photo);
+
     }
-  }
+  }, 
 };
 </script>
